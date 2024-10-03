@@ -2,7 +2,6 @@
 
 import { apiSlice } from "./apiSlice"; // Base API slice
 import { USERS_URL } from "../constants"; // Users API URL
-import { logout } from "./authSlice";
 
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -20,16 +19,27 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: "POST", // HTTP method
         body: userData, // Send email and password
       }),
-      logout: builder.mutation({
-        query: () => ({
-          url: `${USERS_URL}/logout`, // Endpoint for logout
-          method: "POST", // HTTP method
-        }),
+    }),
+    logout: builder.mutation({
+      query: () => ({
+        url: `${USERS_URL}/logout`, // Endpoint for logout
+        method: "POST", // HTTP method
+      }),
+    }),
+    updateUserProfile: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/profile`,
+        method: "PUT", // Use PUT for updating existing data
+        body: data, // Data to be sent in the request body
       }),
     }),
   }),
 });
 
 // Export the auto-generated hook for the login mutation
-export const { useLoginMutation, useLogoutMutation, useRegisterMutation } =
-  usersApiSlice;
+export const {
+  useLoginMutation,
+  useLogoutMutation,
+  useRegisterMutation,
+  useUpdateUserProfileMutation,
+} = usersApiSlice;
