@@ -6,19 +6,30 @@ import { LinkContainer } from "react-router-bootstrap";
 import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import { useGetProductsQuery } from "../../slices/productsApiSlice";
-import { useCreateProductMutation } from "../../slices/productsApiSlice";
+import {
+  useCreateProductMutation,
+  useDeleteProductMutation,
+} from "../../slices/productsApiSlice";
 import Loader from "../../components/Loader";
 import Message from "../../components/Message";
 import { toast } from "react-toastify";
 
 const ProductListScreen = () => {
   const { data: products, isLoading, error, refetch } = useGetProductsQuery();
+  const [deleteProduct, { isLoading: loadingDelete }] =
+    useDeleteProductMutation();
 
-  function deleteHandler(id) {
-    if (window.confirm("Are you sure you want to delete this product")) {
-      console.log("Delete product", id);
+  const deleteHandler = async (id) => {
+    if (window.confirm("Are you sure")) {
+      try {
+        await deleteProduct(id).unwrap();
+        refetch();
+      } catch (err) {
+        toast.error(err?.data?.message || err.error);
+      }
     }
-  }
+  };
+
   const [createProduct, { isLoading: loadingCreate }] =
     useCreateProductMutation();
 
@@ -47,6 +58,8 @@ const ProductListScreen = () => {
           {loadingCreate && <Loader />}
         </Col>
       </Row>
+      {loadingCreate && <Loader />}
+      {loadingDelete && <Loader />}
       {isLoading ? (
         <Loader />
       ) : error ? (
