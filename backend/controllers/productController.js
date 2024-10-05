@@ -4,11 +4,36 @@ import Product from "../models/productsModel.js";
 // @desc    Fetch all products
 // @route   GET /api/products
 // @access  Public
-const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({});
-  res.json(products);
-});
+const getProducts = async (req, res) => {
+  try {
+    const pageSize = Number(req.query.pageSize) || 8; // Default page size
+    const page = Number(req.query.pageNumber) || 1;
 
+    // Extract the keyword from the query parameters
+    const keyword = req.query.keyword
+      ? {
+          name: {
+            $regex: req.query.keyword, // Use regex for partial matching
+            $options: "i", // Case-insensitive
+          },
+        }
+      : {};
+
+    // Get the total count of products matching the keyword
+    const count = await Product.countDocuments({ ...keyword });
+
+    // Fetch the products with pagination and keyword filtering
+    const products = await Product.find({ ...keyword })
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
+
+    res
+      .status(200)
+      .json({ products, page, pages: Math.ceil(count / pageSize) });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 // @desc    Fetch single product
 // @route   GET /api/products/:id
 // @access  Public
@@ -84,10 +109,57 @@ const deleteProduct = asyncHandler(async (req, res) => {
   }
 });
 
+const createProductReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body; // Extract rating and comment from request body
+
+  const product = await Product.findById(req.params.id); // Find the product by ID
+
+  if (product) {
+    // Check if the user has already reviewed this product
+    const alreadyReviewed = product.reviews.find(
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      res.status(400); // Bad request status
+      throw new Error("Product already reviewed");
+    }
+
+    // Create a new review object
+    const review = {
+      name: req.user.name, // User's name
+      rating: Number(rating), // Rating (ensure it's a number)
+      comment, // Comment text
+      user: req.user._id, // User's ID
+    };
+
+    product.reviews.push(review); // Add the review to the product's reviews array
+    product.numReviews = product.reviews.length; // Update the total number of reviews
+
+    // Calculate the product's average rating
+    product.rating =
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length;
+
+    await product.save(); // Save the updated product
+
+    res.status(201).json({ message: "Review added" }); // Send success response
+  } else {
+    res.status(404); // Not found status
+    throw new Error("Product not found");
+  }
+});
+const getTopProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find({}).sort({ rating: -1 }).limit(3);
+
+  res.json(products);
+});
 export {
   getProducts,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
+  createProductReview,
+  getTopProducts,
 };
