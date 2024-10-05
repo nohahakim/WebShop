@@ -1,5 +1,4 @@
 import React from "react";
-import { LinkContainer } from "react-router-bootstrap";
 import { Table, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FaTimes, FaCheck, FaTrash, FaEdit } from "react-icons/fa";
@@ -14,7 +13,7 @@ import { toast } from "react-toastify";
 const UserListScreen = () => {
   const { data: users, isLoading, error, refetch } = useGetUsersQuery();
 
-  const [deleteUser, { isLoading: loadingDelete }] = useDeleteUserMutation();
+  const [deleteUser] = useDeleteUserMutation();
   const deleteHandler = async (id) => {
     if (window.confirm("Are you sure")) {
       try {

@@ -62,14 +62,12 @@ const UserEditScreen = () => {
 
   return (
     <>
-      <Button
-        className="btn btn-light my-3"
-        onClick={() => navigate("/admin/userlist")}
-      >
+      <Link to="/admin/userlist" className="btn btn-light my-3">
         Go Back
-      </Button>
+      </Link>
       <FormContainer>
         <h1>Edit Product</h1>
+        {loadingUpdate && <Loader />}
         {isLoading ? (
           <Loader />
         ) : error ? (

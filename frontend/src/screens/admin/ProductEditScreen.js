@@ -63,6 +63,7 @@ const ProductEditScreen = () => {
         description,
       }).unwrap(); // Unwrap the result
       toast.success("Product updated"); // Show success message
+      refetch();
       navigate("/admin/productlist"); // Navigate back to product list
     } catch (err) {
       toast.error(err?.data?.message || err.error); // Show error message
@@ -94,6 +95,7 @@ const ProductEditScreen = () => {
 
       <FormContainer>
         <h1>Edit Product</h1>
+        {loadingUpdate && <Loader />}
         {isLoading ? (
           <Loader />
         ) : error ? (

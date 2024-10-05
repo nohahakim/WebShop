@@ -6,7 +6,7 @@ import Product from "../models/productsModel.js";
 // @access  Public
 const getProducts = async (req, res) => {
   try {
-    const pageSize = Number(req.query.pageSize) || 8; // Default page size
+    const pageSize = process.env.PAGINATION_LIMIT || 8; // Number of products per page
     const page = Number(req.query.pageNumber) || 1;
 
     // Extract the keyword from the query parameters

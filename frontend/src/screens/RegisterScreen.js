@@ -22,6 +22,14 @@ const RegisterScreen = () => {
   const redirect = searchParams.get("redirect") || "/";
 
   const [register, { isLoading }] = useRegisterMutation();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate(redirect);
+    }
+  }, [navigate, redirect, userInfo]);
+
   const submitHandler = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -87,6 +95,7 @@ const RegisterScreen = () => {
           >
             Register
           </Button>
+          {isLoading && <Loader />}
         </Form.Group>
       </Form>
       <Row className="py-3">

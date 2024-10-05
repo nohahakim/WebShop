@@ -2,8 +2,7 @@
 
 import React from "react";
 import { Table, Button, Row, Col } from "react-bootstrap";
-import { LinkContainer } from "react-router-bootstrap";
-import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import { useGetProductsQuery } from "../../slices/productsApiSlice";
 import {
@@ -59,6 +58,8 @@ const ProductListScreen = () => {
           <Button className="my-3" onClick={createProductHandler}>
             <FaEdit /> Create Product
           </Button>
+          {loadingCreate && <Loader />}
+          {loadingDelete && <Loader />}
 
           {loadingCreate && <Loader />}
         </Col>
