@@ -60,12 +60,9 @@ const ProductListScreen = () => {
           </Button>
           {loadingCreate && <Loader />}
           {loadingDelete && <Loader />}
-
-          {loadingCreate && <Loader />}
         </Col>
       </Row>
-      {loadingCreate && <Loader />}
-      {loadingDelete && <Loader />}
+
       {isLoading ? (
         <Loader />
       ) : error ? (
