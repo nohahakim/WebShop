@@ -17,32 +17,44 @@ import { addToCart, removeFromCart } from "../slices/cartSlice";
 const CartScreen = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const cart = useSelector((state) => state.cart);
-  const { cartItems } = cart;
-  const addToCartHandler = async (product, qty) => {
+
+  const { cartItems } = useSelector((state) => state.cart);
+
+  const addToCartHandler = (product, qty) => {
     dispatch(addToCart({ ...product, qty }));
   };
-  const removeFromCartHandler = async (id) => {
+
+  const removeFromCartHandler = (id) => {
     dispatch(removeFromCart(id));
   };
+
   const checkoutHandler = () => {
     navigate("/login?redirect=shipping");
   };
 
+  const formatCurrency = (num) => {
+    return `$${num.toFixed(2)}`;
+  };
+
+  const totalItems = cartItems.reduce((acc, item) => acc + item.qty, 0);
+  const totalPrice = cartItems.reduce(
+    (acc, item) => acc + item.qty * item.price,
+    0
+  );
+
   return (
     <Row>
       <Col md={8}>
-        <h1 style={{ marginBottom: "20px" }}>Shopping Cart</h1>
+        <h1 className="mb-3">Shopping Cart</h1>
         {cartItems.length === 0 ? (
           <Message>
-            {" "}
-            Your cart is empty <Link to="/">Go Back</Link>{" "}
+            Your cart is empty <Link to="/">Go Back</Link>
           </Message>
         ) : (
           <ListGroup variant="flush">
             {cartItems.map((item) => (
               <ListGroup.Item key={item._id}>
-                <Row>
+                <Row className="align-items-center">
                   <Col md={2}>
                     <Image src={item.image} alt={item.name} fluid rounded />
                   </Col>
@@ -51,11 +63,10 @@ const CartScreen = () => {
                     <Link to={`/product/${item._id}`}>{item.name}</Link>
                   </Col>
 
-                  <Col md={2}>${item.price}</Col>
+                  <Col md={2}>{formatCurrency(item.price)}</Col>
 
                   <Col md={2}>
-                    <Form.Control
-                      as="select"
+                    <Form.Select
                       value={item.qty}
                       onChange={(e) =>
                         addToCartHandler(item, Number(e.target.value))
@@ -66,7 +77,7 @@ const CartScreen = () => {
                           {x + 1}
                         </option>
                       ))}
-                    </Form.Control>
+                    </Form.Select>
                   </Col>
 
                   <Col md={2}>
@@ -89,23 +100,20 @@ const CartScreen = () => {
           <ListGroup variant="flush">
             <ListGroup.Item>
               <h2>
-                Subtotal ({cartItems.reduce((acc, item) => acc + item.qty, 0)})
-                items
+                Subtotal ({totalItems} {totalItems === 1 ? "item" : "items"})
               </h2>
-              $
-              {cartItems
-                .reduce((acc, item) => acc + item.qty * item.price, 0)
-                .toFixed(2)}
+              {formatCurrency(totalPrice)}
             </ListGroup.Item>
             <ListGroup.Item>
-              <Button
-                type="button"
-                className="btn-block"
-                disabled={cartItems.length === 0}
-                onClick={checkoutHandler}
-              >
-                Proceed To Checkout
-              </Button>
+              <div className="d-grid">
+                <Button
+                  type="button"
+                  disabled={cartItems.length === 0}
+                  onClick={checkoutHandler}
+                >
+                  Proceed To Checkout
+                </Button>
+              </div>
             </ListGroup.Item>
           </ListGroup>
         </Card>
