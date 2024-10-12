@@ -76,10 +76,6 @@ const getUserProfile = asyncHandler(async (req, res) => {
   // The user profile is returned as a JSON response
   //
   const user = await User.findById(req.user._id);
-  // Check if the user exists
-  // If the user exists, return the user profile as a JSON response
-  // If the user does not exist, return an error message
-  // The user profile is returned as a JSON response
 
   if (user) {
     res.json({
@@ -99,15 +95,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @route PUT /api/users/profile
 // @access Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-  // Get the user profile based on the user ID stored in the request object
-  // The user ID is obtained from the JWT token
-  // The user profile is returned as a JSON response
   //
   const user = await User.findById(req.user._id);
-  // Check if the user exists
-  // If the user exists, update the user profile with the new data
-  // If the user does not exist, return an error message
-  // The user profile is returned as a JSON response
 
   if (user) {
     user.name = req.body.name || user.name;

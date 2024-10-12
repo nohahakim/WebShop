@@ -87,6 +87,11 @@ const getOrderById = asyncHandler(async (req, res) => {
 // @route   PUT /api/orders/:id/pay
 // @access  Private
 const updateOrderToPaid = asyncHandler(async (req, res) => {
+  // Check if the order belongs to the logged-in user
+  if (order.user.toString() !== req.user._id.toString()) {
+    res.status(401);
+    throw new Error("Unauthorized: You are not allowed to pay for this order");
+  }
   // NOTE: here we need to verify the payment was made to PayPal before marking
   // the order as paid
   const { verified, value } = await verifyPayPalPayment(req.body.id);

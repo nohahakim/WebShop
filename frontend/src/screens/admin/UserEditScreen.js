@@ -1,29 +1,44 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Form, Button } from "react-bootstrap";
+import Message from "../../components/Message";
+import Loader from "../../components/Loader";
+import FormContainer from "../../components/FormContainer";
+import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
 import {
   useGetUserDetailsQuery,
   useUpdateUserMutation,
 } from "../../slices/usersApiSlice";
-import Loader from "../../components/Loader";
-import Message from "../../components/Message";
-import { toast } from "react-toastify";
-import FormContainer from "../../components/FormContainer";
 
 const UserEditScreen = () => {
   const { id: userId } = useParams();
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const navigate = useNavigate();
+
   const {
     data: user,
     isLoading,
     error,
     refetch,
   } = useGetUserDetailsQuery(userId);
+
   const [updateUser, { isLoading: loadingUpdate }] = useUpdateUserMutation();
+
+  const navigate = useNavigate();
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      await updateUser({ userId, name, email, isAdmin });
+      toast.success("user updated successfully");
+      refetch();
+      navigate("/admin/userlist");
+    } catch (err) {
+      toast.error(err?.data?.message || err.error);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -32,33 +47,6 @@ const UserEditScreen = () => {
       setIsAdmin(user.isAdmin);
     }
   }, [user]);
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    try {
-      await updateUser({
-        userId,
-        name,
-        email,
-        isAdmin,
-      });
-      refetch();
-      toast.success("User updated successfully");
-      navigate("/admin/userlist");
-    } catch (err) {
-      toast.error(err?.data?.message || err.error);
-    }
-  };
-  useEffect(() => {
-    // Select the checkbox by its ID
-    const checkbox = document.getElementById("isAdmin");
-
-    // Check if the checkbox exists to avoid null errors
-    if (checkbox) {
-      console.dir(checkbox); // Logs the checkbox DOM element as a JavaScript object
-    } else {
-      console.warn("Checkbox with ID 'isAdmin' not found.");
-    }
-  }, []); // Empty dependency array ensures this runs once after initial render
 
   return (
     <>
@@ -66,7 +54,7 @@ const UserEditScreen = () => {
         Go Back
       </Link>
       <FormContainer>
-        <h1>Edit Product</h1>
+        <h1>Edit User</h1>
         {loadingUpdate && <Loader />}
         {isLoading ? (
           <Loader />
@@ -76,16 +64,17 @@ const UserEditScreen = () => {
           </Message>
         ) : (
           <Form onSubmit={submitHandler}>
-            <Form.Group controlId="name" className="my-2">
+            <Form.Group className="my-2" controlId="name">
               <Form.Label>Name</Form.Label>
               <Form.Control
-                type="text"
+                type="name"
                 placeholder="Enter name"
                 value={name}
-                onChange={(e) => setName(e.target.value)} // Update state
+                onChange={(e) => setName(e.target.value)}
               ></Form.Control>
             </Form.Group>
-            <Form.Group controlId="email" className="my-2">
+
+            <Form.Group className="my-2" controlId="email">
               <Form.Label>Email Address</Form.Label>
               <Form.Control
                 type="email"
@@ -95,7 +84,7 @@ const UserEditScreen = () => {
               ></Form.Control>
             </Form.Group>
 
-            <Form.Group controlId="isAdmin" className="my-2">
+            <Form.Group className="my-2" controlId="isadmin">
               <Form.Check
                 type="checkbox"
                 label="Is Admin"
@@ -104,7 +93,7 @@ const UserEditScreen = () => {
               ></Form.Check>
             </Form.Group>
 
-            <Button type="submit" variant="primary" className="my-2">
+            <Button type="submit" variant="primary">
               Update
             </Button>
           </Form>

@@ -20,15 +20,17 @@ const OrderListScreen = () => {
         </Message>
       ) : (
         <Table striped bordered hover responsive className="table-sm">
-          <tr>
-            <th>ID</th>
-            <th>user</th>
-            <th>Date</th>
-            <th>Total</th>
-            <th>Paid</th>
-            <th>Delivered</th>
-            <th></th>
-          </tr>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>USER</th>
+              <th>DATE</th>
+              <th>TOTAL</th>
+              <th>PAID</th>
+              <th>DELIVERED</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
@@ -44,7 +46,6 @@ const OrderListScreen = () => {
                   )}
                 </td>
                 <td>
-                  {" "}
                   {order.isDelivered ? (
                     order.deliveredAt.substring(0, 10)
                   ) : (
@@ -52,6 +53,10 @@ const OrderListScreen = () => {
                   )}
                 </td>
                 <td>
+                  {/* <Button variant="light" className="btn-sm">
+                    Details
+                  </Button> */}
+
                   <LinkContainer to={`/order/${order._id}`}>
                     <Button variant="light" className="btn-sm">
                       Details
